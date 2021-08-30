@@ -3,9 +3,11 @@ import requests
 from banxico_externalapi.models import Banxico
 
 def call_banxico_api():
+    startdate=(datetime.now()-timedelta(days=7)).strftime("%Y-%m-%d")
+    enddate=datetime.now().strftime("%Y-%m-%d")
     headers={'Bmx-Token':'26ce267411694d00a92d21ae76e6e3da5a005aba9698ac5988a87bfa9817cd54'}
     request = requests.get(
-        "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2021-07-20/2021-08-30",
+        "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/{}/{}".format(startdate,enddate),
         headers=headers,
         timeout=10
     )
