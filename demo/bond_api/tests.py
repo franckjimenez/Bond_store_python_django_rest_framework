@@ -196,7 +196,42 @@ class UsuarioTestCase(TestCase):
             HTTP_AUTHORIZATION='Bearer {}'.format(login.data['access']),
             content_type='application/json'
             )
-        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+
+        def test_sell_bond_one_total_sell_error(self):
+            login= self.client.post(
+                '/api/token/',{
+                    'email':'juan@gmail.com',
+                    'password':'1234',
+                    }
+            )
+
+            response=self.client.post(
+                '/api/sell_bonds/',
+                data=self.bonds_list_one_total_sell_error,
+                HTTP_AUTHORIZATION='Bearer {}'.format(login.data['access']),
+                content_type='application/json'
+                )
+            #self.assertEqual(response.status_code,status.HTTP_201_CREATED)
+
+            #print(response.status_code,response.data)
+
+    def test_sell_bond_one_price_total_error(self):
+        login= self.client.post(
+            '/api/token/',{
+                'email':'juan@gmail.com',
+                'password':'1234',
+                }
+        )
+
+        response=self.client.post(
+            '/api/sell_bonds/',
+            data=self.bonds_list_one_price_total_error,
+            HTTP_AUTHORIZATION='Bearer {}'.format(login.data['access']),
+            content_type='application/json'
+            )
+        #print(response.status_code)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
 
 
     def test_buy_bond_auth(self):
@@ -228,7 +263,7 @@ class UsuarioTestCase(TestCase):
             )
 
         bond_id=response.data[0]['id']
-        print(bond_id)
+        #print(bond_id)
 
         response=self.client.post(
             '/api/buy_bonds/',
@@ -242,9 +277,7 @@ class UsuarioTestCase(TestCase):
             HTTP_AUTHORIZATION='Bearer {}'.format(login.data['access']),
             content_type='application/json'
             )
-
-        print(response.data)
-
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
 
 
 
@@ -253,36 +286,4 @@ class UsuarioTestCase(TestCase):
 
         #print(response.status_code,response.data)
 
-    # def test_sell_bond_one_total_sell_error(self):
-    #     login= self.client.post(
-    #         '/api/token/',{
-    #             'email':'juan@gmail.com',
-    #             'password':'1234',
-    #             }
-    #     )
-
-    #     response=self.client.post(
-    #         '/api/sell_bonds/',
-    #         data=self.bonds_list_one_total_sell_error,
-    #         HTTP_AUTHORIZATION='Bearer {}'.format(login.data['access']),
-    #         content_type='application/json'
-    #         )
-    #     #self.assertEqual(response.status_code,status.HTTP_201_CREATED)
-
-    #     #print(response.status_code,response.data)
-
-    # def test_sell_bond_one_price_total_error(self):
-    #     login= self.client.post(
-    #         '/api/token/',{
-    #             'email':'juan@gmail.com',
-    #             'password':'1234',
-    #             }
-    #     )
-
-    #     response=self.client.post(
-    #         '/api/sell_bonds/',
-    #         data=self.bonds_list_one_price_total_error,
-    #         HTTP_AUTHORIZATION='Bearer {}'.format(login.data['access']),
-    #         content_type='application/json'
-    #         )
-    #     self.assertEqual(response.status_code,status.HTTP_201_CREATED)
+  

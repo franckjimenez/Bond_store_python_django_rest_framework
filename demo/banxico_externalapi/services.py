@@ -10,7 +10,7 @@ def call_banxico_api():
         timeout=10
     )
     
-    print(request.json()['bmx']['series'][0]['datos'][-1])
+    #print(request.json()['bmx']['series'][0]['datos'][-1])
     r_last_date=request.json()['bmx']['series'][0]['datos'][-1]
     date_split=r_last_date['fecha'].split('/')
     r_last_date['fecha']=date_split[-1]+'-'+date_split[-2]+'-'+date_split[-3]
@@ -20,22 +20,24 @@ def update_data_from_banxico():
     banxico_count=Banxico.objects.count()
     if(banxico_count==0):
         r_last_date=call_banxico_api()
-        Banxico.objects.create(last_date=r_last_date['fecha'],dollar_price=r_last_date['dato'])
+        Banxico.objects.create(last_date=r_last_date['fecha'],dollar_price=r_last_date['dato'],last_updated=datetime.now())
     elif(banxico_count>1):
         Banxico.objects.delete()
         r_last_date=call_banxico_api()
-        Banxico.objects.create(last_date=r_last_date['fecha'],dollar_price=r_last_date['dato'])
+        Banxico.objects.create(last_date=r_last_date['fecha'],dollar_price=r_last_date['dato'], last_updated=datetime.now())
     else:
         banxico_id=Banxico.objects.first()
-        print(banxico_id.last_date)
-        last_date=datetime.strptime(str(banxico_id.last_date), '%Y-%m-%d').date()
-        today_date=date.today()
-        today_week=today_date.weekday()
-        last_operational_day=today_date
-        
-        if(today_week>4):
-            last_operational_day=today_date-timedelta(days=today_week-4)
+        last_updated=datetime.strptime(str(banxico_id.last_updated),'%Y-%m-%d %H:%M:%S.%f+00:00')
+        diffMin=(datetime.now()-last_updated).total_seconds()/60
+        #if diffMinutes> 1 minute, call to web api
+        if(diffMin>1):
+            last_date=datetime.strptime(str(banxico_id.last_date), '%Y-%m-%d').date()
+            today_date=date.today()
+            today_week=today_date.weekday()
+            last_operational_day=today_date
+            if(today_week>4):
+                last_operational_day=today_date-timedelta(days=today_week-4)
 
-        if(last_operational_day > last_date):
-            r_last_date=call_banxico_api()
-            Banxico.objects.update(last_date=r_last_date['fecha'],dollar_price=r_last_date['dato'])
+            if(last_operational_day > last_date):
+                r_last_date=call_banxico_api()
+                Banxico.objects.update(last_date=r_last_date['fecha'],dollar_price=r_last_date['dato'],last_updated=datetime.now())

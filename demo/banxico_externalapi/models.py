@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -6,6 +7,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Banxico(models.Model):
     id=models.AutoField(primary_key=True)
+    last_updated=models.DateTimeField(auto_now=True)
     last_date=models.DateField()
     dollar_price=models.DecimalField(
         max_digits=8,
